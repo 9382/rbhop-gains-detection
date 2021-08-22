@@ -193,8 +193,7 @@ local function check(BotId)
         local devMessage = "\nBot tick:      "..math.round(curTick*100)/100 ..
                 "\nPrevious UPS:  "..(lastVel.X^2+lastVel.Z^2)^.5 ..
                 "\nCurrent UPS:   "..curUPS..
-                "\nPredicted UPS: "..projectedUPS..
-                "\nAccurate:      "..tostring(curUPS==projectedUPS)
+                "\nPredicted UPS: "..projectedUPS
         if DEVMODE == true or math.round(curTick*100)/100 == DEVMODE then
             print(devMessage)
         end
