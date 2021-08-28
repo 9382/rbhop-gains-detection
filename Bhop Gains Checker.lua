@@ -11,7 +11,7 @@ local DEVMODE = false
 _G.AutoScan = true
 --Disable to prevent auto-scanning when spectating a bot
 
-print("--{",tick(),"}--")
+print("--{",tick(),"}-- > Loading")
 local botManager,movement,NWVars,styles,remote
 for _,t in next,getgc(true) do
     if type(t) == "table" then
@@ -111,7 +111,7 @@ local function check(BotId)
         return
     end
     local style = styles.Type[NWVars.GetNWInt(botInstance,"Style")]
-    local logText = tostring(tick()).."\n"..gains.."\n"..#frames[1]
+    local logText = tostring(tick()).."\n"..gains.."\n"..#frames[1].."\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
     
     local indexedAngles = {}
     for _,t in next,frames[2] do --Reduce FPS Loss
@@ -128,7 +128,14 @@ local function check(BotId)
     local gainsOffset = {}
     local suspectedGains = {}
     local calculationStart = tick()
-    for _,t in next,frames[1] do
+    local frames1len = #frames[1]
+    for i,t in next,frames[1] do
+        if i % 5000 == 0 then
+            local progress = i/frames1len
+            print("\nProgress: ",progress*100,"%\n["..string.rep("#",math.floor(progress*100))..string.rep("-",100-math.floor(progress*100)).."]")
+            wait(.2)
+            continue --Short pause
+        end
         local curTick = t[1]
         if curTick < 1 then
             continue
@@ -159,7 +166,7 @@ local function check(BotId)
             failedTicks += 1
             lastVel = curVel
             if logRun then
-                logText ..= "\nBot tick: "..math.round(curTick*100)/100 .."\nBroken Tick"
+                logText ..= "\nBT: "..math.round(curTick*100)/100 .."\nBroken Tick"
             end
             continue
         end
@@ -183,17 +190,17 @@ local function check(BotId)
         if not(projectedGain.X >= 0) and not(projectedGain.X <= 0) then
             lastVel = curVel
             if logRun then
-                logText ..= "\nBot tick: "..math.round(curTick*100)/100 .."\nNo Relevant Movement"
+                logText ..= "\nBT: "..math.round(curTick*100)/100 .."\nNo Relevant Movement"
             end
             continue --No movement (-nan(ind))
         end
         local projectedUPS = calculateGains(lastVel,projectedGain)
         projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
         local curUPS = (curVel.X^2+curVel.Z^2)^.5
-        local devMessage = "\nBot tick:      "..math.round(curTick*100)/100 ..
-                "\nPrevious UPS:  "..(lastVel.X^2+lastVel.Z^2)^.5 ..
-                "\nCurrent UPS:   "..curUPS..
-                "\nPredicted UPS: "..projectedUPS
+        local devMessage = "\nBT: "..math.round(curTick*100)/100 ..
+                "\nL UPS: "..(lastVel.X^2+lastVel.Z^2)^.5 ..
+                "\nC UPS: "..curUPS..
+                "\nP UPS: "..projectedUPS
         if DEVMODE == true or math.round(curTick*100)/100 == DEVMODE then
             print(devMessage)
         end
@@ -208,7 +215,7 @@ local function check(BotId)
                 end
                 suspectedGains[guessedGains] += 1
                 if logRun then
-                    logText ..= "\nGains Guess returned "..guessedGains
+                    logText ..= "\nGains Guess: "..guessedGains
                 end
             end
         end
@@ -222,7 +229,7 @@ local function check(BotId)
     print("Calculation time:",calculationTime)
     logText ..= "\nCalculation time: "..calculationTime
     local summaryMessage = "\nSummary for "..botInstance.Name.." ( ID "..botInstance.BotId.." )"..
-        "\nMap:            "..map().name..
+        "\nMap:            "..map().DisplayName.Value.." / "..map().name..
         "\nStyle:          "..style.name..
         "\nChecked Ticks:  "..tickCount..
         "\nAccurate Ticks: "..accurateCount..
@@ -261,7 +268,6 @@ local function check(BotId)
     end
     return true
 end
-check(wantedBot)
 if _G.AutoScan and not _G.Subscribed then
     local scanned = {}
     remote.Subscribe("SetSpectating",function(p)
@@ -281,4 +287,10 @@ if _G.AutoScan and not _G.Subscribed then
         end
     end)
     _G.Subscribed = true
+end
+print("--{",tick(),"}-- > Loaded")
+if check(wantedBot) then
+    print("--{",tick(),"}-- > Checked")
+else
+    print("--{",tick(),"}-- > Nothing to check")
 end
