@@ -259,9 +259,12 @@ local function check(BotId)
         logText ..= extraMessage
     end
     if writefile and logRun then
-        local name = "gs-"..map().DisplayName.Value.."-"..style.name
+        if not isfolder("rbhop-gains-detection") then
+            makefolder("rbhop-gains-detection")
+        end
+        local name = "rbhop-gains-detection/gs-"..map().DisplayName.Value.."-"..style.name
         if accurateCount/tickCount < 0.35 then
-            writefile(name.."-sus.txt",logText)
+            writefile(name.."-suspicious.txt",logText)
         else
             writefile(name.."-legit.txt",logText)
         end
@@ -270,8 +273,9 @@ local function check(BotId)
 end
 if _G.AutoScan and not _G.Subscribed then
     local scanned = {}
-    remote.Subscribe("SetSpectating",function(p)
+    botManager.BotAdded(function(p)
         if type(p) == "table" and _G.AutoScan and not scanned[p.BotId] then
+            print("Autoscan start:",p.BotId)
             while wait(1) do
                 if scanned[p.BotId] then
                     break
@@ -284,6 +288,7 @@ if _G.AutoScan and not _G.Subscribed then
                     break
                 end
             end
+            print("Autoscan done:",p.BotId)
         end
     end)
     _G.Subscribed = true
