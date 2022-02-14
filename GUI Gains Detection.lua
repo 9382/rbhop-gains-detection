@@ -1,5 +1,4 @@
-local wantedBot = 1
-local logRun = true
+local logRun = false
 --Causes a little bit of lag
 --Saves the file in the workspace folder
 local gains = 2.7*1
@@ -314,8 +313,3 @@ if _G.AutoScan and not _G.Subscribed then
     _G.Subscribed = true
 end
 print("--{",tick(),"}-- > Loaded")
-if check(wantedBot) then
-    print("--{",tick(),"}-- > Checked")
-else
-    print("--{",tick(),"}-- > Nothing to check")
-end
