@@ -4,6 +4,8 @@ A script used to examine bot replays in rbhop
 You need some sort of injector like Synapse X or Krnl. Literally just run the script (I recommend the gui one) and itll start scanning the bots automatically.
 itll also print some of the stats in F9 and save it to a log file (if you set it to)
 
+The Live version is designed to work while spectating players, while the other 2 are designed for bots. Do note that the live version is a little more shaky than the bot version - thats just due to the nature of the fact im trynna sort live data, so just deal with what works
+
 ## Notes
 Just because its not 100%, doesnt mean its cheating. Its more common to see anything from 100 to 90%. It could even get as low as 60s or 50s if you use this in surf.
 
