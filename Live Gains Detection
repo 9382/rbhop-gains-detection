@@ -247,4 +247,5 @@ game:GetService("RunService").RenderStepped:Connect(function()
             text.Text = "Not enough\ndata"
         end
     end
+    currentScores[specTarget.UserId] = tracker
 end)
