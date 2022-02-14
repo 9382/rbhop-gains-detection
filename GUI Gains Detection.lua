@@ -115,7 +115,7 @@ local function check(BotId)
     end
     local style = styles.Type[NWVars.GetNWInt(botInstance,"Style")]
     local logText = tostring(tick()).."\n"..gains.."\n"..#frames[1].."\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
-    
+
     local indexedAngles = {}
     for _,t in next,frames[2] do --Reduce FPS Loss
         local floored = math.floor(t[1]*5)
@@ -124,7 +124,7 @@ local function check(BotId)
         end
         indexedAngles[floored][#indexedAngles[floored]+1] = t
     end
-    
+
     local lastVel
     local tickCount,accurateCount,failedTicks = 0,0,0
     local accuracyScore = {}
@@ -236,7 +236,9 @@ local function check(BotId)
         "\nBroken Ticks:   "..failedTicks..
         "\nAccuracy%:      "..accurateCount/tickCount*100
     print(summaryMessage)
-    logText ..= summaryMessage
+    if logRun then
+        logText ..= summaryMessage
+    end
     if accurateCount/tickCount < 0.4 then --Not looking good
         local totalWeight = 0
         local bestValue = {0,0}
@@ -250,7 +252,9 @@ local function check(BotId)
             "\nAccuracy% mid way ( "..math.floor(#accuracyScore/2)/100 .." ): "..accuracyScore[math.floor(#accuracyScore/2)]*100 ..
             "\nPredicted Gains:      "..bestValue[1].." ( "..bestValue[1]*2.7 .." ) at "..(bestValue[2]/totalWeight)*100 .." %"
         print(extraMessage)
-        logText ..= extraMessage
+        if logRun then
+            logText ..= extraMessage
+        end
     end
     if writefile and logRun then
         if not isfolder("rbhop-gains-detection") then
