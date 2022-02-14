@@ -210,9 +210,7 @@ remote.Subscribe("SetSpectating",function(u)
     specTarget = type(u) == "userdata" and u
 end)
 game:GetService("ReplicatedStorage").Movement.OnClientEvent:Connect(function(user,frames)
-    if user == specTarget then
-        check(user,frames)
-    end
+    check(user,frames)
 end)
 game:GetService("RunService").RenderStepped:Connect(function()
     if not specTarget then
