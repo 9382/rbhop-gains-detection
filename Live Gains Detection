@@ -208,7 +208,6 @@ end
 local specTarget
 remote.Subscribe("SetSpectating",function(u)
     specTarget = type(u) == "userdata" and u
-    text.Visible = type(u) == "userdata"
 end)
 game:GetService("ReplicatedStorage").Movement.OnClientEvent:Connect(function(user,frames)
     if user == specTarget then
@@ -217,8 +216,10 @@ game:GetService("ReplicatedStorage").Movement.OnClientEvent:Connect(function(use
 end)
 game:GetService("RunService").RenderStepped:Connect(function()
     if not specTarget then
+        text.Visible = false
         return
     end
+    text.Visible = true
     local tracker = currentScores[specTarget.UserId]
     if tracker then
         local suspectedGains = {} --Im lazy, so lets do a horrible approach!
