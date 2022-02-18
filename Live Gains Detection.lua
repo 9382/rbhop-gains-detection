@@ -201,7 +201,33 @@ local function check(user,frames)
         tracker[tick()] = guessedGains
         lastVel = curVel
     end
+    local suspectedGains = {}
+    local expired = {}
+    for time,gains in next,tracker do
+        if tick()-time > 2 then
+            expired[#expired+1] = time
+        else
+            suspectedGains[gains] = suspectedGains[gains] or 0
+            suspectedGains[gains] += 1
+        end
+    end
+    for _,t in next,expired do
+        tracker[t] = nil
+    end
     currentScores[user.UserId] = tracker
+    local totalWeight = 0
+    local bestValue = {0,0}
+    for guess,weight in next,suspectedGains do
+        totalWeight += weight
+        if weight > bestValue[2] then
+            bestValue = {guess,weight}
+        end
+    end
+    local gain = bestValue[1]
+    local score = bestValue[2]
+    if totalWeight > 100 and score/totalWeight >= .9 and gain ~= 1 and tonumber(gain) then
+        warn("[GC Live]",user,"just hit 90%+ certainty on irregular gains",gain)
+    end
     return true
 end
 
@@ -212,6 +238,9 @@ end)
 game:GetService("ReplicatedStorage").Movement.OnClientEvent:Connect(function(user,frames)
     check(user,frames)
 end)
+local function len(t)
+    local c=0 for _,_ in next,t do c+=1 end return c
+end
 game:GetService("RunService").RenderStepped:Connect(function()
     if not specTarget then
         text.Visible = false
@@ -221,17 +250,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
     local tracker = currentScores[specTarget.UserId]
     if tracker then
         local suspectedGains = {} --Im lazy, so lets do a horrible approach!
-        local expired = {}
         for time,gains in next,tracker do
-            if tick()-time > 2 then
-                expired[#expired+1] = time
-            else
-                suspectedGains[gains] = suspectedGains[gains] or 0
-                suspectedGains[gains] += 1
-            end
-        end
-        for _,t in next,expired do
-            table.remove(tracker,t)
+            suspectedGains[gains] = suspectedGains[gains] or 0
+            suspectedGains[gains] += 1
         end
         local totalWeight = 0
         local bestValue = {0,0}
@@ -247,5 +268,5 @@ game:GetService("RunService").RenderStepped:Connect(function()
             text.Text = "Not enough\ndata"
         end
     end
-    currentScores[specTarget.UserId] = tracker
 end)
+print("--{",tick(),"}-- > Loaded")
