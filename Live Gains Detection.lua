@@ -238,9 +238,6 @@ end)
 game:GetService("ReplicatedStorage").Movement.OnClientEvent:Connect(function(user,frames)
     check(user,frames)
 end)
-local function len(t)
-    local c=0 for _,_ in next,t do c+=1 end return c
-end
 game:GetService("RunService").RenderStepped:Connect(function()
     if not specTarget then
         text.Visible = false
