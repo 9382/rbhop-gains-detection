@@ -228,8 +228,12 @@ local function check(user,frames)
     end
     local gain = bestValue[1]
     local score = bestValue[2]
-    if totalWeight > 100 and score/totalWeight >= .9 and gain ~= 1 and tonumber(gain) then
-        warn("[GC Live]",user,"just hit 90%+ certainty on irregular gains",gain)
+    if totalWeight > 80 and score/totalWeight >= .5 and gain ~= 1 and tonumber(gain) then
+        warnText = user.Name.." just hit 50%+ certainty on irregular gains "..gain
+        warn("[GC Live]",warnText)
+        if CustomNotice then
+            CustomNotice(warnText,"GC Live")
+        end
     end
     return true
 end
@@ -270,3 +274,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 print("--{",tick(),"}-- > Loaded")
+if CustomNotice then
+    CustomNotice("Loaded","GC Live")
+end
