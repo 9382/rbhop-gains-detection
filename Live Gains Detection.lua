@@ -122,6 +122,9 @@ local currentScores = {}
 local function check(user,frames)
     local style = styles.Type[NWVars.GetNWInt(user,"Style")]
     local indexedAngles = {}
+    if not frames[1] or not frames[2] then
+        return --concerning
+    end
     for _,t in next,frames[2] do --Reduce FPS Loss
         local floored = math.floor(t[1]*2)
         if not indexedAngles[floored] then
