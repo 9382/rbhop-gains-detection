@@ -114,7 +114,6 @@ local function check(BotId)
         return
     end
     local style = styles.Type[NWVars.GetNWInt(botInstance,"Style")]
-    print(tick,tick,tick,tick,tick)
     local logText = tick().."\n"..gains.."\n"..#frames[1].."\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
 
     local indexedAngles = {}
@@ -179,12 +178,13 @@ local function check(BotId)
             continue
         end
         local curFPS = 1/(angleAfter[1]-angleBefore[1])
-        if curFPS > 600 and warns <= 20 then
-            warn(botInstance.Name,"just hit",curFPS,"FPS (Warning threshold 600)")
+        if curFPS > 600 then
             warns += 1
-        elseif warns == 21 then
-            warn(botInstance.Name,"passed maximum warn limit for FPS of 20")
-            warns += 1
+            if warns <= 20 then
+                warn(botInstance.Name,"just hit",curFPS,"FPS (Warning threshold 600) on",roundedTick)
+            elseif warns == 21 then
+                warn(botInstance.Name,"passed maximum warn limit for FPS of 20 on",roundedTick)
+            end
         end
         averageFPS[#averageFPS+1] = curFPS
         if curFPS < fpsStats.min then
@@ -263,6 +263,7 @@ local function check(BotId)
         "\nAverage FPS:    "..totalFPS..
         "\nMinimum FPS:    "..fpsStats.min.." ( "..fpsStats.mint.." )"..
         "\nMaximum FPS:    "..fpsStats.max.." ( "..fpsStats.maxt.." )"..
+        "\n>600FPS Frames: "..warns..
         "\nAccuracy%:      "..accurateCount/tickCount*100
     print(summaryMessage)
     if logRun then
