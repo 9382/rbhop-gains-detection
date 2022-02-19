@@ -114,7 +114,8 @@ local function check(BotId)
         return
     end
     local style = styles.Type[NWVars.GetNWInt(botInstance,"Style")]
-    local logText = tostring(tick()).."\n"..gains.."\n"..#frames[1].."\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
+    print(tick,tick,tick,tick,tick)
+    local logText = tick().."\n"..gains.."\n"..#frames[1].."\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
 
     local indexedAngles = {}
     for _,t in next,frames[2] do --Reduce FPS Loss
@@ -130,6 +131,8 @@ local function check(BotId)
     local accuracyScore = {}
     local gainGuesses = {}
     local suspectedGains = {}
+    local averageFPS = {}
+    local fpsStats = {min=9e9,max=0}
     local calculationStart = tick()
     local frames1len = #frames[1]
     for i,t in next,frames[1] do
@@ -174,9 +177,13 @@ local function check(BotId)
             end
             continue
         end
-        if (angleAfter[1]-angleBefore[1]) < 1/600 then
+        local curFPS = 1/(angleAfter[1]-angleBefore[1])
+        if curFPS > 600 then
             warn(botInstance.Name,"just hit",1/(angleAfter[1]-angleBefore[1]),"FPS (Warning threshold 600)")
         end
+        averageFPS[#averageFPS+1] = curFPS
+        fpsStats.min = math.min(fpsStats.min,curFPS)
+        fpsStats.max = math.max(fpsStats.max,curFPS)
         local heldKeys
         for _,v in next,frames[4] do
             if v[1] < curTick then
@@ -228,6 +235,11 @@ local function check(BotId)
         accuracyScore[#accuracyScore+1] = accurateCount/tickCount
         gainGuesses[roundedTick] = guessedGains
     end
+    local totalFPS = 0
+    for _,f in next,averageFPS do
+        totalFPS += f
+    end
+    totalFPS = totalFPS / #averageFPS
     local calculationTime = tick()-calculationStart
     print("Calculation time:",calculationTime)
     logText ..= "\nCalculation time: "..calculationTime
@@ -237,6 +249,9 @@ local function check(BotId)
         "\nChecked Ticks:  "..tickCount..
         "\nAccurate Ticks: "..accurateCount..
         "\nBroken Ticks:   "..failedTicks..
+        "\nAverage FPS:    "..totalFPS..
+        "\nMinimum FPS:    "..fpsStats.min..
+        "\nMaximum FPS:    "..fpsStats.max..
         "\nAccuracy%:      "..accurateCount/tickCount*100
     print(summaryMessage)
     if logRun then
