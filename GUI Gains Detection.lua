@@ -132,7 +132,8 @@ local function check(BotId)
     local gainGuesses = {}
     local suspectedGains = {}
     local averageFPS = {}
-    local fpsStats = {min=9e9,max=0}
+    local warns = 0
+    local fpsStats = {min=9e9,mint=0,max=0,maxt=0}
     local calculationStart = tick()
     local frames1len = #frames[1]
     for i,t in next,frames[1] do
@@ -178,12 +179,22 @@ local function check(BotId)
             continue
         end
         local curFPS = 1/(angleAfter[1]-angleBefore[1])
-        if curFPS > 600 then
-            warn(botInstance.Name,"just hit",1/(angleAfter[1]-angleBefore[1]),"FPS (Warning threshold 600)")
+        if curFPS > 600 and warns <= 20 then
+            warn(botInstance.Name,"just hit",curFPS,"FPS (Warning threshold 600)")
+            warns += 1
+        elseif warns == 21 then
+            warn(botInstance.Name,"passed maximum warn limit for FPS of 20")
+            warns += 1
         end
         averageFPS[#averageFPS+1] = curFPS
-        fpsStats.min = math.min(fpsStats.min,curFPS)
-        fpsStats.max = math.max(fpsStats.max,curFPS)
+        if curFPS < fpsStats.min then
+            fpsStats.min = curFPS
+            fpsStats.mint = roundedTick
+        end
+        if curFPS > fpsStats.max then
+            fpsStats.max = curFPS
+            fpsStats.maxt = roundedTick
+        end
         local heldKeys
         for _,v in next,frames[4] do
             if v[1] < curTick then
@@ -250,8 +261,8 @@ local function check(BotId)
         "\nAccurate Ticks: "..accurateCount..
         "\nBroken Ticks:   "..failedTicks..
         "\nAverage FPS:    "..totalFPS..
-        "\nMinimum FPS:    "..fpsStats.min..
-        "\nMaximum FPS:    "..fpsStats.max..
+        "\nMinimum FPS:    "..fpsStats.min.." ( "..fpsStats.mint.." )"..
+        "\nMaximum FPS:    "..fpsStats.max.." ( "..fpsStats.maxt.." )"..
         "\nAccuracy%:      "..accurateCount/tickCount*100
     print(summaryMessage)
     if logRun then
