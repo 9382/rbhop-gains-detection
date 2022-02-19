@@ -174,6 +174,9 @@ local function check(BotId)
             end
             continue
         end
+        if (angleAfter[1]-angleBefore[1]) < 1/600 then
+            warn(botInstance.Name,"just hit",1/(angleAfter[1]-angleBefore[1]),"FPS (Warning threshold 600)")
+        end
         local heldKeys
         for _,v in next,frames[4] do
             if v[1] < curTick then
