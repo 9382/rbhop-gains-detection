@@ -9,7 +9,7 @@ local gains = 2.7*1
 --Do not use results given with a value other than 2.7
 
 print("--{",tick(),"}-- > Loading")
-local botManager,movement,NWVars,styles,remote
+local botManager,movement,NWVars,styles,remote,chatMessageEvent
 for _,t in next,getgc(true) do
     if type(t) == "table" then
         if rawget(t,"Bots") then
@@ -26,6 +26,9 @@ for _,t in next,getgc(true) do
         end
         if rawget(t,"Add") and rawget(t,"InitLast") then
             remote = t
+        end
+        if rawget(t,"NewChatMessage") then
+            chatMessageEvent = t.NewChatMessage
         end
     end
 end
@@ -48,6 +51,17 @@ all comes from the Movement remote in RS
 all frame data same format (LOOK UP)
 (THERE MAY BE NO f[3] OR f[4])
 --]]
+
+--Slightly different shade to differentiate
+local function CustomNotice(text,name)
+    chatMessageEvent({"List",
+        {"FGColor",{a=255,b=100,g=100,r=100}},{"Text","["}, 
+        {"FGColor",{a=255,b=200,g=80,r=50}},{"Text",name or "Notice"},
+        {"FGColor",{a=255,b=100,g=100,r=100}},{"Text","] "},
+        {"FGColor",{a=255,b=255,g=255,r=255}},{"Text",text}
+    },0)
+end
+getgenv().CustomNotice = CustomNotice --for convenience
 
 local function map()
 	for _,v in next,workspace:GetChildren() do
@@ -231,9 +245,7 @@ local function check(user,frames)
     if totalWeight > 80 and score/totalWeight >= .5 and gain ~= 1 and tonumber(gain) then
         warnText = user.Name.." just hit 50%+ certainty on irregular gains "..gain
         warn("[GC Live]",warnText)
-        if CustomNotice then
-            CustomNotice(warnText,"GC Live")
-        end
+        CustomNotice(warnText,"GC Live")
     end
     return true
 end
@@ -274,6 +286,4 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 print("--{",tick(),"}-- > Loaded")
-if CustomNotice then
-    CustomNotice("Loaded","GC Live")
-end
+CustomNotice("Loaded","GC Live")
