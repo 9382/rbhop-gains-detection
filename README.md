@@ -1,7 +1,7 @@
 # rbhop-gains-detection
 A script used to examine bot replays in rbhop
 
-You need some sort of injector for this to work. Literally just run one of the scripts and itll start scanning the bots automatically.
+You need some sort of injector for this to work. Literally just run one of the scripts and itll start scanning automatically.
 itll also print some of the stats in F9 and save it to a log file with the GUI one (if you set it to)
 
 The Live version is designed to work while spectating players, while the GUI one is designed for bots. Do note that the live version is a little more shaky than the bot version - thats just due to the nature of the fact im trynna sort live data, so just deal with what works. And running both at the same time is perfectly stable, so dont worry about that.
