@@ -23,4 +23,4 @@ The alert threshold is set to 600 as most people wouldnt hit this high of an fps
 
 A run below 600 fps can also still be timescaled, but thats not really determinable with this.
 
-(Keep in mind: Roblox sucks. ive seen people running at capped 60 FPS get marked at 140 - its stupid)
+(Keep in mind: Roblox sucks. ive seen people running at capped 60 FPS get marked at a max of 140 - its stupid, welcome to the roblox engine)
