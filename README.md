@@ -15,3 +15,12 @@ If you really cant tell if its cheated or a false alert, ask me (oef#4032) and i
 
 (RUNS BEFORE ~ JANUARY 2020 USED DIFFERENT CAMERA LERP LOGIC - THAT MEANS THE SCAN WONT WORK ON THEM.
 You can recognise this by how the accuracy and gains prediction accuracy will be wildly low, and the gains will be all over the place)
+
+## The FPS part
+The FPS stats part of the GUI one<sub>(ill add it to live later)</sub> is mostly for determining if a run is Timescaled. Of course, theres no easy way to tell with timescale in most cases, so this can only act as a "guide" and not hard proof.
+
+The alert threshold is set to 600 as most people wouldnt hit this high of an fps (timescaling essentially increases the fps of a replay bot), but just because it sets of warnings doesnt mean its timescaled - some people just have stupid good PCs (Although once your at 1000+ id be worried)
+
+A run below 600 fps can also still be timescaled, but thats not really determinable with this.
+
+(Keep in mind: Roblox sucks. ive seen people running at capped 60 FPS get marked at 140 - its stupid)
