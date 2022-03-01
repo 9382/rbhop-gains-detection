@@ -88,6 +88,13 @@ local function numToKeys(number,keys)
     return returnKeys
 end
 
+local function isnan(n)
+    return not(n <= 0) and not(n > 0)
+    --Pure stupidity
+end
+local function UPS(v)
+    return (v.X^2+v.Z^2)^.5
+end
 local dot = Vector3.new().Dot
 local function calculateGains(speed,angles,specifiedGains)
     local gains = specifiedGains or gains
@@ -97,32 +104,18 @@ local function calculateGains(speed,angles,specifiedGains)
     end
     return speed+(gains-var)*angles
 end
-local function guessGains(lastVel,curUPS,projectedGain)
-    local projectedUPS = calculateGains(lastVel,projectedGain)
-    projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
-    -- if projectedUPS > curUPS then
-    --     return --Lost speed due to something, irrelevant
-    -- end
-    local currentGuess = 1
-    local iterator = 1
-    while true do
-        local projectedUPS = calculateGains(lastVel,projectedGain,2.7*currentGuess)
-        projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
-        if projectedUPS == curUPS then
-            return currentGuess
-        end
-        if projectedUPS > curUPS then
-            currentGuess -= iterator
-            iterator /= 10
-            if iterator == 0.00001 then
-                if currentGuess <= 0 then
-                    return "Less than\n0"
-                end
-                return currentGuess --Close enough :)
-            end
-        end
-        currentGuess += iterator
+local function guessGains(lastVel,curVel,angles)
+    local diff = UPS(curVel-lastVel)
+    local expectedDiff = UPS(calculateGains(lastVel,angles)-lastVel)
+    local prediction = math.round(diff/expectedDiff*1e6)/1e6
+    if isnan(prediction) then --0/0 (i dont wanna know why)
+        return "NaN"
+    elseif prediction == math.huge then
+        return "Walking" --Probably anyways
+    elseif prediction <= 0 then
+        return "Less than\n0"
     end
+    return prediction
 end
 
 local text = Instance.new("TextLabel",Instance.new("ScreenGui",game.CoreGui))
@@ -211,10 +204,8 @@ local function check(user,frames)
             lastVel = curVel
             continue --No movement (-nan(ind))
         end
-        local projectedUPS = calculateGains(lastVel,projectedGain)
-        projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
-        local curUPS = (curVel.X^2+curVel.Z^2)^.5
-        local guessedGains = (curUPS==projectedUPS and 1) or guessGains(lastVel,curUPS,projectedGain)
+        local projectedUPS = UPS(calculateGains(lastVel,projectedGain))
+        local guessedGains = (UPS(curVel)==projectedUPS and 1) or guessGains(lastVel,curVel,projectedGain)
         tracker[tick()] = guessedGains
         lastVel = curVel
     end
