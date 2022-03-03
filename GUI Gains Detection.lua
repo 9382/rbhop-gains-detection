@@ -65,6 +65,9 @@ local function numToKeys(number,keys)
     return returnKeys
 end
 
+local function fixtrailing(n)
+    return math.round(n*1e8)/1e8--Why roblox
+end
 local function isnan(n)
     return not(n <= 0) and not(n > 0)
     --Pure stupidity
@@ -319,7 +322,7 @@ game:GetService'RunService'.RenderStepped:Connect(function()
     end
     local curTime = math.round(NWVars.GetNWFloat(specTarget,"TimeNow")*100)/100+1
     if gainGuesses[curTime] then
-        text.Text = gainGuesses[curTime]
+        text.Text = fixtrailing(gainGuesses[curTime])
         text.Visible = true
     end
 end)
