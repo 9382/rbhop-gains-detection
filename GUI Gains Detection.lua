@@ -124,7 +124,33 @@ local function check(BotId)
     local logText = tick().."\n"..gains.."\n"..#frames[1].."\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
 
     local indexedAngles = {}
-    for _,t in next,frames[2] do --Reduce FPS Loss
+    local averageFPS = {}
+    local warns = 0
+    local fpsStats = {min=9e9,mint=0,max=0,maxt=0}
+    local starttime = frames[1][1][1]
+    for i,t in next,frames[2] do --Reduce FPS Loss
+        local prevframe = frames[2][i-1]
+        if prevframe then
+            local roundedTick = math.round((t[1]-starttime)*100)/100
+            local curFPS = 1/(t[1]-prevframe[1])
+            if curFPS > 600 then
+                warns += 1
+                if warns <= 20 then
+                    warn(botInstance.Name,"just hit",curFPS,"FPS (Warning threshold 600) on",roundedTick)
+                elseif warns == 21 then
+                    warn(botInstance.Name,"passed maximum warn limit for FPS of 20 on",roundedTick)
+                end
+            end
+            averageFPS[#averageFPS+1] = curFPS
+            if curFPS < fpsStats.min then
+                fpsStats.min = curFPS
+                fpsStats.mint = roundedTick
+            end
+            if curFPS > fpsStats.max then
+                fpsStats.max = curFPS
+                fpsStats.maxt = roundedTick
+            end
+        end
         local floored = math.floor(t[1]*5)
         if not indexedAngles[floored] then
             indexedAngles[floored] = {}
@@ -137,9 +163,6 @@ local function check(BotId)
     local accuracyScore = {}
     local gainGuesses = {}
     local suspectedGains = {}
-    local averageFPS = {}
-    local warns = 0
-    local fpsStats = {min=9e9,mint=0,max=0,maxt=0}
     local calculationStart = tick()
     local frames1len = #frames[1]
     for i,t in next,frames[1] do
@@ -183,24 +206,6 @@ local function check(BotId)
                 logText ..= "\nBT: "..roundedTick.."\nBroken Tick"
             end
             continue
-        end
-        local curFPS = 1/(angleAfter[1]-angleBefore[1])
-        if curFPS > 600 then
-            warns += 1
-            if warns <= 20 then
-                warn(botInstance.Name,"just hit",curFPS,"FPS (Warning threshold 600) on",roundedTick)
-            elseif warns == 21 then
-                warn(botInstance.Name,"passed maximum warn limit for FPS of 20 on",roundedTick)
-            end
-        end
-        averageFPS[#averageFPS+1] = curFPS
-        if curFPS < fpsStats.min then
-            fpsStats.min = curFPS
-            fpsStats.mint = roundedTick
-        end
-        if curFPS > fpsStats.max then
-            fpsStats.max = curFPS
-            fpsStats.maxt = roundedTick
         end
         local heldKeys
         for _,v in next,frames[4] do
@@ -272,7 +277,7 @@ local function check(BotId)
     if logRun then
         logText ..= summaryMessage
     end
-    if accurateCount/tickCount < 0.4 then --Not looking good
+    if accurateCount/tickCount < 0.5 then --Not looking good
         local totalWeight = 0
         local bestValue = {0,0}
         for guess,weight in next,suspectedGains do
@@ -284,7 +289,7 @@ local function check(BotId)
         local extraMessage = "\nExtra Info for "..botInstance.Name.." ( ID "..botInstance.BotId.." )"..
             "\nAccuracy% mid way ( "..math.floor(#accuracyScore/2)/100 .." ): "..accuracyScore[math.floor(#accuracyScore/2)]*100 ..
             "\nPredicted Gains:      "..bestValue[1].." ( "..bestValue[1]*gains .." ) at "..(bestValue[2]/totalWeight)*100 .." %"
-        print(extraMessage)
+        warn(extraMessage)
         if logRun then
             logText ..= extraMessage
         end
@@ -294,7 +299,7 @@ local function check(BotId)
             makefolder("rbhop-gains-detection")
         end
         local name = "rbhop-gains-detection/gs-"..map().DisplayName.Value.."-"..style.name
-        if accurateCount/tickCount < 0.35 then
+        if accurateCount/tickCount < 0.4 then
             writefile(name.."-suspicious.txt",logText)
         else
             writefile(name.."-legit.txt",logText)
@@ -322,7 +327,11 @@ game:GetService'RunService'.RenderStepped:Connect(function()
     end
     local curTime = math.round(NWVars.GetNWFloat(specTarget,"TimeNow")*100)/100+1
     if gainGuesses[curTime] then
-        text.Text = fixtrailing(gainGuesses[curTime])
+        if tonumber(gainGuesses[curTime]) then
+            text.Text = fixtrailing(gainGuesses[curTime])
+        else
+            text.Text = gainGuesses[curTime]
+        end
         text.Visible = true
     end
 end)
