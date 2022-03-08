@@ -65,8 +65,9 @@ local function numToKeys(number,keys)
     return returnKeys
 end
 
-local function fixtrailing(n)
-    return math.round(n*1e8)/1e8--Why roblox
+local function fixtrailing(n,x)
+    local x = x or 7
+    return math.round(n*10^x)/10^x--Why roblox
 end
 local function isnan(n)
     return not(n <= 0) and not(n > 0)
@@ -84,32 +85,12 @@ local function calculateGains(speed,angles,specifiedGains)
     end
     return speed+(gains-var)*angles
 end
-local function guessGains(lastVel,curUPS,projectedGain)
-    local projectedUPS = calculateGains(lastVel,projectedGain)
-    projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
-    -- if projectedUPS > curUPS then
-    --     return --Lost speed due to something, irrelevant
-    -- end
-    local currentGuess = 1
-    local iterator = 1
-    while true do
-        local projectedUPS = calculateGains(lastVel,projectedGain,2.7*currentGuess)
-        projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
-        if projectedUPS == curUPS then
-            return currentGuess
-        end
-        if projectedUPS > curUPS then
-            currentGuess -= iterator
-            iterator /= 10
-            if iterator == 0.00001 then
-                if currentGuess <= 0 then
-                    return "Less than\n0"
-                end
-                return currentGuess --Close enough :)
-            end
-        end
-        currentGuess += iterator
-    end
+local function guessGains(lastVel,curVel,angles)
+    return fixtrailing(((curVel-lastVel).X/angles.X+dot(lastVel,angles))/2.7,5)
+    --Yes, this does introduce rounding issues as it means people barely gaining
+    --Seem like they are using gains 1
+    --But thats only if they use a gains of less than ~1.000005x
+    --I think i can accept that being marked as "1"
 end
 
 local results = {} --Log all results for displaying
@@ -240,7 +221,7 @@ local function check(BotId)
         if logRun then
             logText ..= devMessage
         end
-        local guessedGains = (curUPS==projectedUPS and 1) or guessGains(lastVel,curUPS,projectedGain)
+        local guessedGains = (curUPS==projectedUPS and 1) or guessGains(lastVel,curVel,projectedGain)
         if not suspectedGains[guessedGains] then
             suspectedGains[guessedGains] = 0
         end
