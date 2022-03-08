@@ -88,6 +88,10 @@ local function numToKeys(number,keys)
     return returnKeys
 end
 
+local function fixtrailing(n,x)
+    local x = x or 7
+    return math.round(n*10^x)/10^x--Why roblox
+end
 local function isnan(n)
     return not(n <= 0) and not(n > 0)
     --Pure stupidity
@@ -104,32 +108,12 @@ local function calculateGains(speed,angles,specifiedGains)
     end
     return speed+(gains-var)*angles
 end
-local function guessGains(lastVel,curUPS,projectedGain)
-    local projectedUPS = calculateGains(lastVel,projectedGain)
-    projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
-    -- if projectedUPS > curUPS then
-    --     return --Lost speed due to something, irrelevant
-    -- end
-    local currentGuess = 1
-    local iterator = 1
-    while true do
-        local projectedUPS = calculateGains(lastVel,projectedGain,2.7*currentGuess)
-        projectedUPS = (projectedUPS.X^2+projectedUPS.Z^2)^.5
-        if projectedUPS == curUPS then
-            return currentGuess
-        end
-        if projectedUPS > curUPS then
-            currentGuess -= iterator
-            iterator /= 10
-            if iterator == 0.00001 then
-                if currentGuess <= 0 then
-                    return "Less than\n0"
-                end
-                return currentGuess --Close enough :)
-            end
-        end
-        currentGuess += iterator
-    end
+local function guessGains(lastVel,curVel,angles)
+    return fixtrailing(((curVel-lastVel).X/angles.X+dot(lastVel,angles))/2.7,5)
+    --Yes, this does introduce rounding issues as it means people barely gaining
+    --Seem like they are using gains 1
+    --But thats only if they use a gains of less than ~1.000005x
+    --I think i can accept that being marked as "1"
 end
 
 local text = Instance.new("TextLabel",Instance.new("ScreenGui",game.CoreGui))
@@ -219,7 +203,7 @@ local function check(user,frames)
             continue --No movement (-nan(ind))
         end
         local projectedUPS = UPS(calculateGains(lastVel,projectedGain))
-        local guessedGains = (UPS(curVel)==projectedUPS and 1) or guessGains(lastVel,UPS(curVel),projectedGain)
+        local guessedGains = (UPS(curVel)==projectedUPS and 1) or guessGains(lastVel,curVel,projectedGain)
         tracker[tick()] = guessedGains
         lastVel = curVel
     end
