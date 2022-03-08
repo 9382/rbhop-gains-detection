@@ -138,7 +138,7 @@ local function check(BotId)
         end
         indexedAngles[floored][#indexedAngles[floored]+1] = t
     end
-
+    
     local lastVel
     local tickCount,accurateCount,failedTicks = 0,0,0
     local accuracyScore = {}
@@ -252,7 +252,7 @@ local function check(BotId)
         "\nAverage FPS:    "..totalFPS..
         "\nMinimum FPS:    "..fpsStats.min.." ( "..fpsStats.mint.." )"..
         "\nMaximum FPS:    "..fpsStats.max.." ( "..fpsStats.maxt.." )"..
-        "\n>600FPS Frames: "..warns..
+        "\n>600FPS Frames: "..warns.." / "..#frames[2]..
         "\nAccuracy%:      "..accurateCount/tickCount*100
     print(summaryMessage)
     if logRun then
