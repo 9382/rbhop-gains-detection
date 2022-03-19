@@ -86,8 +86,7 @@ local function calculateGains(speed,angles,specifiedGains)
     return speed+(gains-var)*angles
 end
 local function guessGains(lastVel,curVel,angles)
-    local predicted = fixtrailing(((curVel-lastVel).X/angles.X+dot(lastVel,angles))/2.7,4)
-    return predicted == 0 and "None" or predicted < 0 and "Less than 0" or predicted
+    return fixtrailing(((curVel-lastVel).X/angles.X+dot(lastVel,angles))/2.7,4)
     --Yes, this does introduce rounding issues as it means people barely gaining
     --Seem like they are using gains 1
     --But thats only if they use a gains of less than ~1.000005x
