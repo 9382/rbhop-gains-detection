@@ -234,7 +234,7 @@ local function check(user,frames)
     local score = bestValue[2]
     if totalWeight > 80 and score/totalWeight >= .5 and gain ~= 1 and tonumber(gain) then
         warnText = user.Name.." just hit 50%+ certainty on irregular gains "..gain
-        warn("[GC Live]",warnText)
+        --warn("[GC Live]",warnText)
         CustomNotice(warnText,"GC Live")
     end
     return true
