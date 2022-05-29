@@ -247,7 +247,7 @@ local function check(user, frames)
 	local gain = bestValue[1]
 	local score = bestValue[2]
 
-	if totalWeight > 80 and score / totalWeight >= 0.5 and gain ~= 1 and tonumber(gain) then
+	if totalWeight > 80 and score / totalWeight >= 0.5 and gain ~= 1 and tonumber(gain) > 0 then
 		CustomNotice(user.Name .. " just hit 50%+ certainty on irregular gains " .. gain, "GC Live")
 	end
 
