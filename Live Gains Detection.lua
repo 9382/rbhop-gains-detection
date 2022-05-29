@@ -48,16 +48,11 @@ end
 
 --Slightly different shade to differentiate
 local function CustomNotice(text, name)
-	chatMessageEvent({
-		"List",
-		{ "FGColor", { a = 255, b = 100, g = 100, r = 100 } },
-		{ "Text", "[" },
-		{ "FGColor", { a = 255, b = 200, g = 80, r = 50 } },
-		{ "Text", name or "Notice" },
-		{ "FGColor", { a = 255, b = 100, g = 100, r = 100 } },
-		{ "Text", "] " },
-		{ "FGColor", { a = 255, b = 255, g = 255, r = 255 } },
-		{ "Text", text },
+	chatMessageEvent({"List",
+		{"FGColor", {a=255, b=100, g=100, r=100}}, {"Text", "["},
+		{"FGColor", {a=255, b=200, g=80,  r=50}},  {"Text", name or "Notice" },
+		{"FGColor", {a=255, b=100, g=100, r=100}}, {"Text", "] "},
+		{"FGColor", {a=255, b=255, g=255, r=255}}, {"Text", text},
 	}, 0)
 end
 getgenv().CustomNotice = CustomNotice --for convenience
@@ -65,7 +60,7 @@ getgenv().CustomNotice = CustomNotice --for convenience
 local function numToKeys(number, keys)
 	local returnKeys = {}
 
-	for i, v in next, { " ", "d", "s", "a", "w" } do
+	for i, v in next, {" ", "d", "s", "a", "w"} do
 		local keyPower = 2 ^ (5 - i)
 		if number - keyPower >= 0 then
 			returnKeys[v] = 1
@@ -198,10 +193,7 @@ local function check(user, frames)
 			continue
 		end
 
-		local curAngle = angleBefore[2]:Lerp(
-			angleAfter[2],
-			(-angleBefore[1] + curTick) / (angleAfter[1] - angleBefore[1])
-		)
+		local curAngle = angleBefore[2]:Lerp(angleAfter[2], (-angleBefore[1] + curTick) / (angleAfter[1] - angleBefore[1]))
 		local yCos = cos(curAngle.Y)
 		local ySin = sin(curAngle.Y)
 		local SmW = keys["s"] - keys["w"]
@@ -238,13 +230,13 @@ local function check(user, frames)
 	currentScores[user.UserId] = tracker
 
 	local totalWeight = 0
-	local bestValue = { 0, 0 }
+	local bestValue = {0, 0}
 
 	for guess, weight in next, suspectedGains do
 		totalWeight = totalWeight + weight
 
 		if weight > bestValue[2] then
-			bestValue = { guess, weight }
+			bestValue = {guess, weight}
 		end
 	end
 
@@ -286,12 +278,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 
 		local totalWeight = 0
-		local bestValue = { 0, 0 }
+		local bestValue = {0, 0}
 
 		for guess, weight in next, suspectedGains do
 			totalWeight = totalWeight + weight
 			if weight > bestValue[2] then
-				bestValue = { guess, weight }
+				bestValue = {guess, weight}
 			end
 		end
 
