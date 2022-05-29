@@ -172,7 +172,7 @@ local function checkBot(botID)
 	for i, t in next, frames[1] do
 		if i % 1000 == 0 then
 			if i % 5000 == 0 then
-				print("--{", tick(), "}-- > Calculating:", i / frames1Len * 100, "%")
+				print("--{", tick(), "}-- > Calculating:", i / frames1Len * 100 .. "%")
 			end
 			task.wait(0.1)
 		end
@@ -285,7 +285,7 @@ local function checkBot(botID)
 	print("Calculation time:", calculationTime)
 	logText = logText .. "\nCalculation time: " .. calculationTime .. "\n"
 
-	local summaryMessage = "Summary for " .. botInstance.Name .. " ( ID " .. botID .. " ) ( " .. gains .. " )" ..
+	local summaryMessage = "Summary for " .. botInstance.Name .. " (ID " .. botID .. ") (" .. gains .. ")" ..
 		"\nMap:            " .. map().DisplayName.Value .. " / " .. map().name ..
 		"\nStyle:          " .. style.name ..
 		"\nChecked Ticks:  " .. tickCount ..
@@ -293,8 +293,8 @@ local function checkBot(botID)
 		"\nBroken Ticks:   " .. failedTicks ..
 		"\nAverage FPS:    " .. meanFPS ..
 		"\nstdDev FPS:     " .. stdDevFPS ..
-		"\nMinimum FPS:    " .. fpsStats.min .. " ( " .. fpsStats.mint .. " )" ..
-		"\nMaximum FPS:    " .. fpsStats.max .. " ( " .. fpsStats.maxt .. " )" ..
+		"\nMinimum FPS:    " .. fpsStats.min .. " (" .. fpsStats.mint .. ")" ..
+		"\nMaximum FPS:    " .. fpsStats.max .. " (" .. fpsStats.maxt .. ")" ..
 		"\n>" .. fpsWarnAt .."FPS Frames: " .. warns .. " / " .. #frames[2] ..
 		"\nAccuracy%:      " .. accurateCount / tickCount * 100
 
@@ -313,9 +313,9 @@ local function checkBot(botID)
 			end
 		end
 
-		local extraMessage = "\nExtra Info for " .. botInstance.Name .. " ( ID " .. botID .. " )" ..
-			"\nAccuracy% mid way ( " .. math.floor(#accuracyScore / 2) / 100 .." ): " .. accuracyScore[math.floor(#accuracyScore / 2)] * 100 ..
-			"\nPredicted Gains:      " .. bestValue[1] .. " ( " .. bestValue[1] * gains .. " ) at " .. (bestValue[2] / totalWeight) * 100 .. "%"
+		local extraMessage = "\nExtra Info for " .. botInstance.Name .. " (ID " .. botID .. ")" ..
+			"\nAccuracy% mid way (" .. math.floor(#accuracyScore / 2) / 100 .."): " .. accuracyScore[math.floor(#accuracyScore / 2)] * 100 ..
+			"\nPredicted Gains:      " .. bestValue[1] .. " (" .. bestValue[1] * gains .. ") at " .. (bestValue[2] / totalWeight) * 100 .. "%"
 
 		warn(extraMessage)
 		logText = logText ..  extraMessage
