@@ -4,7 +4,7 @@ local logRun = true
 
 --NOTE: Gain guessing is automatic. Only use this for testing
 --Do not use results given with a changed value
-local gains = 2.7
+local gains = 2.7 * 1
 
 -- Where it should warn about fps limit
 local fpsWarnAt = 600
