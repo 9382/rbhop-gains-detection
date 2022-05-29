@@ -9,7 +9,11 @@
 local gains = 2.7 * 1
 
 print("--{", tick(), "}-- > Loading")
+
 local NWVars, styles, remote, chatMessageEvent
+local cos = math.cos
+local sin = math.sin
+
 for _, t in next, getgc(true) do
 	if type(t) == "table" then
 		if rawget(t, "GetNWInt") then
