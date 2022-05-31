@@ -44,7 +44,7 @@ end
 	frames[1] is every physics tick (0.01)
 	frames[2] == {1:Tick,2:Angles}
 	frames[2] is every frame of the runner (presumably) (Varies in length)
-	frames[3] == {1:?,2:Gravity}
+	frames[3] == {1:Date,2:Gravity}
 	frames[3] only occurs once
 	frames[4] == {1:Time,2:HeldKeys}
 	frames[4] only updates when theres a change of keys
