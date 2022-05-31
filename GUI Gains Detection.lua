@@ -113,17 +113,18 @@ local function checkBot(botID)
 		return
 	end
 
+	local frames2 = frames[2]
 	local style = styles.Type[NWVars.GetNWInt(botInstance, "Style")]
 	local logText = tick() .. "\n" .. gains .. "\n" .. #frames[1] .. "\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
 
 	local indexedAngles = {}
-	local FPSValues = {}
+	local totalFPS, squareTotalFPS = 0, 0
 	local warns = 0
 	local fpsStats = {min=9e9, mint=0, max=0, maxt=0}
 	local startTime = frames[1][1][1]
 
-	for i, t in next, frames[2] do
-		local prevFrame = frames[2][i - 1]
+	for i, t in next, frames2 do
+		local prevFrame = frames2[i - 1]
 
 		if prevFrame then
 			local roundedTick = round(t[1] - startTime)
@@ -139,7 +140,8 @@ local function checkBot(botID)
 				end
 			end
 
-			insert(FPSValues, curFPS)
+			totalFPS = totalFPS + curFPS
+			squareTotalFPS = squareTotalFPS + (curFPS * curFPS)
 
 			if curFPS < fpsStats.min then
 				fpsStats.min = curFPS
@@ -270,16 +272,9 @@ local function checkBot(botID)
 		gainGuesses[roundedTick] = guessedGains
 	end
 
-	local totalFPS = 0
-	local squareTotalFPS = 0
-
-	for _, x in next, FPSValues do
-		totalFPS = totalFPS + x
-		squareTotalFPS = squareTotalFPS + x ^ 2
-	end
-
-	local meanFPS = totalFPS / #FPSValues
-	local stdDevFPS = ((squareTotalFPS - totalFPS ^ 2 / #FPSValues) / (#FPSValues - 1)) ^ 0.5
+	local numFrames = #frames2 - 1 -- Subtract 1 because we don't use the first frame
+	local meanFPS = totalFPS / numFrames
+	local stdDevFPS = ((squareTotalFPS - totalFPS ^ 2 / numFrames) / (numFrames - 1)) ^ 0.5
 	local calculationTime = tick() - calculationStart
 
 	print("Calculation time:", calculationTime)
@@ -295,7 +290,7 @@ local function checkBot(botID)
 		"\nstdDev FPS:     " .. stdDevFPS ..
 		"\nMinimum FPS:    " .. fpsStats.min .. " (" .. fpsStats.mint .. ")" ..
 		"\nMaximum FPS:    " .. fpsStats.max .. " (" .. fpsStats.maxt .. ")" ..
-		"\n>" .. fpsWarnAt .."FPS Frames: " .. warns .. " / " .. #frames[2] ..
+		"\n>" .. fpsWarnAt .."FPS Frames: " .. warns .. " / " .. numFrames ..
 		"\nAccuracy%:      " .. accurateCount / tickCount * 100
 
 	print(summaryMessage)
