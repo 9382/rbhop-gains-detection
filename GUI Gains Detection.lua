@@ -1,6 +1,6 @@
 --Causes a little bit of lag
 --Saves the file in the workspace folder
-local logRun = true
+local logRun = false
 
 --NOTE: Gain guessing is automatic. Only use this for testing
 --Do not use results given with a changed value
