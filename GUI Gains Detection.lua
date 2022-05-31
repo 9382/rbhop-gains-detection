@@ -173,11 +173,9 @@ local function checkBot(botID)
 	local frames1Len = #frames[1]
 
 	for i, t in next, frames[1] do
-		if i % 1000 == 0 then
-			if i % 5000 == 0 then
-				print("--{", tick(), "}-- > Calculating:", i / frames1Len * 100 .. "%")
-			end
-			task.wait(0.1)
+		if i % 5000 == 0 then
+			print("--{", tick(), "}-- > Calculating:", i / frames1Len * 100 .. "%")
+			task.wait(0.2)
 		end
 
 		local curTick = t[1]
