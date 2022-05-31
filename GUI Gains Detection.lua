@@ -115,7 +115,11 @@ local function checkBot(botID)
 
 	local frames2 = frames[2]
 	local style = styles.Type[NWVars.GetNWInt(botInstance, "Style")]
-	local logText = tick() .. "\n" .. gains .. "\n" .. #frames[1] .. "\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
+	local logText = ""
+
+	if logRun then
+		logText = logText .. tick() .. "\n" .. gains .. "\n" .. #frames[1] .. "\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
+	end
 
 	local indexedAngles = {}
 	local totalFPS, squareTotalFPS = 0, 0
@@ -221,7 +225,9 @@ local function checkBot(botID)
 			failedTicks = failedTicks + 1
 			lastVel = curVel
 
-			logText = logText .. "\nBT: " .. roundedTick .. "\nBroken Tick"
+			if logRun then
+				logText = logText .. "\nBT: " .. roundedTick .. "\nBroken Tick"
+			end
 
 			continue
 		end
@@ -249,18 +255,23 @@ local function checkBot(botID)
 		if isNaN(projectedGain.X) then
 			lastVel = curVel
 
-			logText = logText .. "\nBT: " .. roundedTick .. "\nNo Relevant Movement"
+			if logRun then
+				logText = logText .. "\nBT: " .. roundedTick .. "\nNo Relevant Movement"
+			end
 
 			continue
 		end
 
 		local projectedUPS = UPS(calculateGains(lastVel, projectedGain))
 		local curUPS = UPS(curVel)
-		logText = logText ..
-				"\nBT: " .. roundedTick ..
-				"\nL UPS: " .. UPS(lastVel) ..
-				"\nC UPS: " .. curUPS ..
-				"\nP UPS: " .. projectedUPS
+
+		if logRun then
+			logText = logText ..
+					"\nBT: " .. roundedTick ..
+					"\nL UPS: " .. UPS(lastVel) ..
+					"\nC UPS: " .. curUPS ..
+					"\nP UPS: " .. projectedUPS
+		end
 
 		local guessedGains = (curUPS == projectedUPS and 1) or guessGains(lastVel, curVel, projectedGain)
 
@@ -269,7 +280,10 @@ local function checkBot(botID)
 		end
 
 		suspectedGains[guessedGains] = suspectedGains[guessedGains] + 1
-		logText = logText .. "\nGains Guess: " .. guessedGains
+
+		if logRun then
+			logText = logText .. "\nGuessd gains: " .. guessedGains
+		end
 
 		lastVel = curVel
 		tickCount = tickCount + 1
@@ -283,9 +297,6 @@ local function checkBot(botID)
 	local stdDevFPS = ((squareTotalFPS - totalFPS ^ 2 / numFrames) / (numFrames - 1)) ^ 0.5
 	local calculationTime = tick() - calculationStart
 
-	print("Calculation time:", calculationTime)
-	logText = logText .. "\nCalculation time: " .. calculationTime .. "\n"
-
 	local summaryMessage = "Summary for " .. botInstance.Name .. " (ID " .. botID .. ") (" .. gains .. ")" ..
 		"\nMap:            " .. map().DisplayName.Value .. " / " .. map().name ..
 		"\nStyle:          " .. style.name ..
@@ -297,10 +308,14 @@ local function checkBot(botID)
 		"\nMinimum FPS:    " .. fpsStats.min .. " (" .. fpsStats.mint .. ")" ..
 		"\nMaximum FPS:    " .. fpsStats.max .. " (" .. fpsStats.maxt .. ")" ..
 		"\n>" .. fpsWarnAt .."FPS Frames: " .. warns .. " / " .. numFrames ..
-		"\nAccuracy%:      " .. accurateCount / tickCount * 100
+		"\nAccuracy%:      " .. accurateCount / tickCount * 100 ..
+		"\nCalculation time: " .. calculationTime .. " seconds"
 
 	print(summaryMessage)
-	logText = logText .. summaryMessage
+
+	if logRun then
+		logText = logText .. summaryMessage
+	end
 
 	if accurateCount / tickCount < 0.5 then --Not looking good
 		local totalWeight = 0
@@ -319,7 +334,10 @@ local function checkBot(botID)
 			"\nPredicted Gains:      " .. bestValue[1] .. " (" .. bestValue[1] * gains .. ") at " .. (bestValue[2] / totalWeight) * 100 .. "%"
 
 		warn(extraMessage)
-		logText = logText ..  extraMessage
+
+		if logRun then
+			logText = logText ..  extraMessage
+		end
 	end
 
 	if writefile and logRun then
