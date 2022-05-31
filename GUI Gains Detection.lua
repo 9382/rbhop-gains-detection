@@ -198,11 +198,15 @@ local function checkBot(botID)
 
 		for a = -1, 1, 1 do
 			a = floored + a
+			local prevIndexed = 1
 
 			if indexedAngles[a] then
-				for _, v in next, indexedAngles[a] do
+				for k = prevIndexed, #indexedAngles[a] do
+					local v = indexedAngles[a][k]
+
 					if v[1] < curTick then
 						angleBefore = v
+						prevIndexed = k
 					else
 						angleAfter = v
 						break
