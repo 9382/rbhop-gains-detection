@@ -165,6 +165,7 @@ local function checkBot(botID)
 
 	local lastVel
 	local tickCount, accurateCount, failedTicks = 0, 0, 0
+	local prevHeld = 1
 	local accuracyScore = {}
 	local gainGuesses = {}
 	local suspectedGains = {}
@@ -224,9 +225,12 @@ local function checkBot(botID)
 		end
 
 		local heldKeys
-		for _, v in next, frames[4] do
+		for k = prevHeld, #frames[4] do
+			local v = frames[4][k]
+
 			if v[1] < curTick then
 				heldKeys = v[2]
+				prevHeld = k
 			else
 				break
 			end
