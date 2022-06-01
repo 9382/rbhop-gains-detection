@@ -115,12 +115,6 @@ local function checkBot(botID)
 
 	local frames2 = frames[2]
 	local style = styles.Type[NWVars.GetNWInt(botInstance, "Style")]
-	local logText = ""
-
-	if logRun then
-		logText = logText .. tick() .. "\n" .. gains .. "\n" .. #frames[1] .. "\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick"
-	end
-
 	local indexedAngles = {}
 	local totalFPS, squareTotalFPS = 0, 0
 	local warns = 0
@@ -237,7 +231,6 @@ local function checkBot(botID)
 			lastVel = curVel
 
 			if logRun then
-				--logText = logText .. "\nBT: " .. roundedTick .. "\nBroken Tick"
 				insert(logInfo, {0, roundedTick})
 			end
 
@@ -268,7 +261,6 @@ local function checkBot(botID)
 			lastVel = curVel
 
 			if logRun then
-				--logText = logText .. "\nBT: " .. roundedTick .. "\nNo Relevant Movement"
 				insert(logInfo, {1, roundedTick})
 			end
 
@@ -277,15 +269,6 @@ local function checkBot(botID)
 
 		local projectedUPS = UPS(calculateGains(lastVel, projectedGain))
 		local curUPS = UPS(curVel)
-
-		--[[if logRun then
-			logText = logText ..
-					"\nBT: " .. roundedTick ..
-					"\nL UPS: " .. UPS(lastVel) ..
-					"\nC UPS: " .. curUPS ..
-					"\nP UPS: " .. projectedUPS
-		end]]
-
 		local guessedGains = (curUPS == projectedUPS and 1) or guessGains(lastVel, curVel, projectedGain)
 
 		if not suspectedGains[guessedGains] then
@@ -295,7 +278,6 @@ local function checkBot(botID)
 		suspectedGains[guessedGains] = suspectedGains[guessedGains] + 1
 
 		if logRun then
-			--logText = logText .. "\nGuessed gains: " .. guessedGains
 			insert(logInfo, {2, roundedTick, UPS(lastVel), curUPS, projectedUPS, guessedGains})
 		end
 
@@ -328,7 +310,6 @@ local function checkBot(botID)
 	print(summaryMessage)
 
 	if logRun then
-		--logText = logText .. summaryMessage
 		insert(logInfo, {3, summaryMessage})
 	end
 
@@ -351,7 +332,6 @@ local function checkBot(botID)
 		warn(extraMessage)
 
 		if logRun then
-			--logText = logText ..  extraMessage
 			insert(logInfo, {3, extraMessage})
 		end
 	end
@@ -375,23 +355,31 @@ local function checkBot(botID)
 
 		writefile(name, tick() .. "\n" .. gains .. "\n" .. #frames[1] .. "\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick")
 
-		-- Write log info to empty file using append instead of storing all the info in memory
-		for _, v in next, logInfo do
-			local key = v[1]
+		local function formatInfo(info)
+			local key = info[1]
 
 			if key == 1 then
-				appendfile(name, "\nBT: " .. v[2] .. "\nNo Relevant Movement")
+				return "\nBT: " .. info[2] .. "\nNo Relevant Movement"
 			elseif key == 2 then
-				appendfile(name,
-						"\nBT: " .. v[2] ..
-						"\nL UPS: " .. v[3] ..
-						"\nC UPS: " .. v[4] ..
-						"\nP UPS: " .. v[5] ..
-						"\nGuessed gains: " .. v[6]
-				)
+				return "\nBT: " .. info[2] ..
+						"\nL UPS: " .. info[3] ..
+						"\nC UPS: " .. info[4] ..
+						"\nP UPS: " .. info[5] ..
+						"\nGuessed gains: " .. info[6]
 			elseif key == 3 then
-				appendfile(name, v[2])
+				return info[2]
 			end
+		end
+
+		-- Break up log text into chunks of 100 logs per append
+		for i = 1, #logText, 100 do
+			local chunk = ""
+
+			for j = 0, 99 do
+				chunk = chunk .. formatInfo(logInfo[i + j])
+			end
+
+			appendfile(name, chunk)
 		end
 	end
 
