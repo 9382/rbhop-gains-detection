@@ -372,7 +372,7 @@ local function checkBot(botID)
 		end
 
 		-- Break up log text into chunks of 100 logs per append
-		for i = 1, #logText, 100 do
+		for i = 1, #logInfo, 100 do
 			local chunk = ""
 
 			for j = 0, 99 do
