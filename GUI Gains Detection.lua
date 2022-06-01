@@ -298,7 +298,7 @@ local function checkBot(botID)
 	local stdDevFPS = ((squareTotalFPS - totalFPS ^ 2 / numFrames) / (numFrames - 1)) ^ 0.5
 	local calculationTime = tick() - calculationStart
 
-	local summaryMessage = "Summary for " .. botInstance.Name .. " (ID " .. botID .. ") (" .. gains .. ")" ..
+	local summaryMessage = "\nSummary for " .. botInstance.Name .. " (ID " .. botID .. ") (" .. gains .. ")" ..
 		"\nMap:            " .. map().DisplayName.Value .. " / " .. map().name ..
 		"\nStyle:          " .. style.name ..
 		"\nChecked Ticks:  " .. tickCount ..
