@@ -358,7 +358,9 @@ local function checkBot(botID)
 		local function formatInfo(info)
 			local key = info[1]
 
-			if key == 1 then
+			if key == 0 then
+				return "\nBT: " .. info[2] .. "\nBroken Tick"
+			elseif key == 1 then
 				return "\nBT: " .. info[2] .. "\nNo Relevant Movement"
 			elseif key == 2 then
 				return "\nBT: " .. info[2] ..
