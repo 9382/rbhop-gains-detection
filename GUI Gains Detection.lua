@@ -178,7 +178,8 @@ local function checkBot(botID)
 
 	for i, t in next, frames[1] do
 		if i % 5000 == 0 then
-			print("--{", tick(), "}-- > Calculating:", i / frames1Len * 100 .. "%")
+			local progress = (i / frames1Len) * 100
+			print("\nProgress: ", progress, "%\n[" .. string.rep("#", math.floor(progress)) .. string.rep("-", 100 - math.floor(progress)).."]")
 			task.wait(0.2)
 		end
 
