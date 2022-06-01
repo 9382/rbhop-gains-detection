@@ -376,7 +376,9 @@ local function checkBot(botID)
 			local chunk = ""
 
 			for j = 0, 99 do
-				chunk = chunk .. formatInfo(logInfo[i + j])
+				if logInfo[i + j] then
+					chunk = chunk .. formatInfo(logInfo[i + j])
+				end
 			end
 
 			appendfile(name, chunk)
