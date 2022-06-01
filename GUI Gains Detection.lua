@@ -176,6 +176,16 @@ local function checkBot(botID)
 	local calculationStart = tick()
 	local frames1Len = #frames[1]
 
+	--[[
+		{key, value(s)}
+		keys:
+			0 = Broken tick
+			1 = No relevant movement
+			2 = Tick data
+			3 = Just text
+	]]
+	local logInfo = {}
+
 	for i, t in next, frames[1] do
 		if i % 5000 == 0 then
 			local progress = (i / frames1Len) * 100
@@ -227,7 +237,8 @@ local function checkBot(botID)
 			lastVel = curVel
 
 			if logRun then
-				logText = logText .. "\nBT: " .. roundedTick .. "\nBroken Tick"
+				--logText = logText .. "\nBT: " .. roundedTick .. "\nBroken Tick"
+				insert(logInfo, {0, roundedTick})
 			end
 
 			continue
@@ -257,7 +268,8 @@ local function checkBot(botID)
 			lastVel = curVel
 
 			if logRun then
-				logText = logText .. "\nBT: " .. roundedTick .. "\nNo Relevant Movement"
+				--logText = logText .. "\nBT: " .. roundedTick .. "\nNo Relevant Movement"
+				insert(logInfo, {1, roundedTick})
 			end
 
 			continue
@@ -266,13 +278,13 @@ local function checkBot(botID)
 		local projectedUPS = UPS(calculateGains(lastVel, projectedGain))
 		local curUPS = UPS(curVel)
 
-		if logRun then
+		--[[if logRun then
 			logText = logText ..
 					"\nBT: " .. roundedTick ..
 					"\nL UPS: " .. UPS(lastVel) ..
 					"\nC UPS: " .. curUPS ..
 					"\nP UPS: " .. projectedUPS
-		end
+		end]]
 
 		local guessedGains = (curUPS == projectedUPS and 1) or guessGains(lastVel, curVel, projectedGain)
 
@@ -283,7 +295,8 @@ local function checkBot(botID)
 		suspectedGains[guessedGains] = suspectedGains[guessedGains] + 1
 
 		if logRun then
-			logText = logText .. "\nGuessd gains: " .. guessedGains
+			--logText = logText .. "\nGuessed gains: " .. guessedGains
+			insert(logInfo, {2, roundedTick, UPS(lastVel), curUPS, projectedUPS, guessedGains})
 		end
 
 		lastVel = curVel
@@ -315,7 +328,8 @@ local function checkBot(botID)
 	print(summaryMessage)
 
 	if logRun then
-		logText = logText .. summaryMessage
+		--logText = logText .. summaryMessage
+		insert(logInfo, {3, summaryMessage})
 	end
 
 	if accurateCount / tickCount < 0.5 then --Not looking good
@@ -337,7 +351,8 @@ local function checkBot(botID)
 		warn(extraMessage)
 
 		if logRun then
-			logText = logText ..  extraMessage
+			--logText = logText ..  extraMessage
+			insert(logInfo, {3, extraMessage})
 		end
 	end
 
@@ -356,11 +371,27 @@ local function checkBot(botID)
 		end
 
 		local name = "rbhop-gains-detection/gs-" .. displayName .. "-" .. style.name .. "-" .. botInstance.Name:sub(7)
+					.. ((accurateCount / tickCount < 0.5) and "-suspicious.txt" or "-legit.txt")
 
-		if accurateCount / tickCount < 0.5 then
-			writefile(name .. "-suspicious.txt", logText)
-		else
-			writefile(name .. "-legit.txt", logText)
+		writefile(name, tick() .. "\n" .. gains .. "\n" .. #frames[1] .. "\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick")
+
+		-- Write log info to empty file using append instead of storing all the info in memory
+		for _, v in next, logInfo do
+			local key = v[1]
+
+			if key == 1 then
+				appendfile(name, "\nBT: " .. v[2] .. "\nNo Relevant Movement")
+			elseif key == 2 then
+				appendfile(name,
+						"\nBT: " .. v[2] ..
+						"\nL UPS: " .. v[3] ..
+						"\nC UPS: " .. v[4] ..
+						"\nP UPS: " .. v[5] ..
+						"\nGuessed gains: " .. v[6]
+				)
+			elseif key == 3 then
+				appendfile(name, v[2])
+			end
 		end
 	end
 
