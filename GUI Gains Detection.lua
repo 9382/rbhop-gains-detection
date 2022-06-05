@@ -293,7 +293,7 @@ local function checkBot(botID)
 	local stdDevFPS = ((squareTotalFPS - totalFPS ^ 2 / numFrames) / (numFrames - 1)) ^ 0.5
 	local calculationTime = tick() - calculationStart
 
-	local summaryMessage = "\nSummary for " .. botInstance.Name .. " (ID " .. botID .. ") (" .. gains .. ")" ..
+	local summaryMessage = "Summary for " .. botInstance.Name .. " (ID " .. botID .. ") (" .. gains .. ")" ..
 		"\nMap:            " .. map().DisplayName.Value .. " / " .. map().name ..
 		"\nStyle:          " .. style.name ..
 		"\nChecked Ticks:  " .. tickCount ..
@@ -303,7 +303,7 @@ local function checkBot(botID)
 		"\nstdDev FPS:     " .. stdDevFPS ..
 		"\nMinimum FPS:    " .. fpsStats.min .. " (" .. fpsStats.mint .. ")" ..
 		"\nMaximum FPS:    " .. fpsStats.max .. " (" .. fpsStats.maxt .. ")" ..
-		"\n>" .. fpsWarnAt .."FPS Frames: " .. warns .. " / " .. numFrames ..
+		"\n>" .. fpsWarnAt .. "FPS Frames: " .. warns .. " / " .. numFrames ..
 		"\nAccuracy%:      " .. accurateCount / tickCount * 100 ..
 		"\nCalculation time: " .. calculationTime .. " seconds"
 
@@ -325,7 +325,7 @@ local function checkBot(botID)
 			end
 		end
 
-		local extraMessage = "\nExtra Info for " .. botInstance.Name .. " (ID " .. botID .. ")" ..
+		local extraMessage = "Extra Info for " .. botInstance.Name .. " (ID " .. botID .. ")" ..
 			"\nAccuracy% mid way (" .. math.floor(#accuracyScore / 2) / 100 .."): " .. accuracyScore[math.floor(#accuracyScore / 2)] * 100 ..
 			"\nPredicted Gains:      " .. bestValue[1] .. " (" .. bestValue[1] * gains .. ") at " .. (bestValue[2] / totalWeight) * 100 .. "%"
 
@@ -369,7 +369,7 @@ local function checkBot(botID)
 						"\nP UPS: " .. info[5] ..
 						"\nGuessed gains: " .. info[6]
 			elseif key == 3 then
-				return info[2]
+				return "\n" .. info[2]
 			end
 		end
 
