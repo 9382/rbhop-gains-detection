@@ -336,6 +336,9 @@ local function checkBot(botID)
 		end
 	end
 
+	-- Previously this was done in a single string, but now the data is instead put into a table
+	-- Based on the key of the table, the data is written to a string in chunks of a certain size
+	-- These chunks are then individually written to the file
 	if writefile and logRun then
 		if not isfolder("rbhop-gains-detection") then
 			makefolder("rbhop-gains-detection")
@@ -355,6 +358,7 @@ local function checkBot(botID)
 
 		writefile(name, tick() .. "\n" .. gains .. "\n" .. #frames[1] .. "\nL=Last\nC=Current\nP=Predicted\nBT=Bot Tick")
 
+		-- This could just be done in the loop, but it's neater this way
 		local function formatInfo(info)
 			local key = info[1]
 
