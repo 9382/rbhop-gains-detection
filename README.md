@@ -1,3 +1,8 @@
+# Archived
+The main game was recently updated to new physics, which has its own anticheat that does this script's job for me. Not only that, but this script wont work in the first place due to large changes to the backend of the client and all the systems. This script can be considered deprecated / defunct.
+
+The original README is kept below
+
 # rbhop-gains-detection
 A script used to examine bot replays in rbhop
 
